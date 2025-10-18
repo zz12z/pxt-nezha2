@@ -277,6 +277,32 @@ namespace nezhaV2 {
         motorDelay(1, SportsMode.Second)
     }
 
+
+    //% group="Basic functions"
+    //% weight=398
+    //%block="set servo %motor to zero at speed %speed \%"
+    //% speed.min=1  speed.max=100
+    export function resetWithSpeed(motor: MotorPostion, speed: number = 100): void {
+        // 限制速度范围
+        if (speed < 1) {
+            speed = 1;
+        } else if (speed > 100) {
+            speed = 100;
+        }
+
+        // 设置速度
+        setServoSpeed(speed);
+
+        // 读取当前位置来判断移动方向和距离
+        let currentAngle = readAbsAngle(motor);
+
+        // 使用moveToAbsAngle移动到0度位置（最短路径）
+        moveToAbsAngle(motor, ServoMotionMode.ShortPath, 0, DelayMode.AutoDelayStatus);
+
+        // 重置相对角度数组
+        relativeAngularArr[motor - 1] = 0;
+    }
+
     //% group="Basic functions"
     //% weight=399
     //%block="set servo %motor relative angular to zero"
@@ -417,3 +443,4 @@ namespace nezhaV2 {
         return `V ${version[0]}.${version[1]}.${version[2]}`;
     }
 }
+
