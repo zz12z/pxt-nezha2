@@ -1,7 +1,5 @@
-
-//% color=#ff0011  icon="\uf06d" block="nezhaV2" blockId="nezhaV2"
+//% color=#ff0011 icon="\uf06d" block="nezhaV2" blockId="nezhaV2"
 namespace nezhaV2 {
-
     export enum MovementDirection {
         //%block="clockwise"
         CW = 1,
@@ -16,7 +14,6 @@ namespace nezhaV2 {
         //%block="shortest path"
         ShortPath = 1
     }
-    
     export enum DelayMode {
         //%block="automatic delay"
         AutoDelayStatus = 1,
@@ -31,22 +28,18 @@ namespace nezhaV2 {
         //%block="seconds"
         Second = 3
     }
-    
-    
     export enum VerticallDirection {
         //%block="forward"
         Up = 1,
         //%block="backward"
         Down = 2
     }
-    
     export enum Uint {
         //%block="cm"
         cm = 1,
         //%block="inch"
         inch = 2
     }
-    
     export enum DistanceAndAngleUnit {
         //%block="degrees"
         Degree = 2,
@@ -59,7 +52,6 @@ namespace nezhaV2 {
         //%block="inch"
         inch = 5
     }
-    
     export enum MotorPostion {
         //%block="M1"
         M1 = 1,
@@ -70,7 +62,6 @@ namespace nezhaV2 {
         //%block="M4"
         M4 = 4
     }
-
     let i2cAddr: number = 0x10;
     let servoSpeedGlobal = 900
     // 相对角度值(用于相对角度值归零函数)
@@ -79,14 +70,11 @@ namespace nezhaV2 {
     let motorLeftGlobal = 0
     let motorRightGlobal = 0
     let degreeToDistance = 0
-
     export function delayMs(ms: number): void {
         let time = input.runningTime() + ms
         while (time >= input.runningTime()) {
-
         }
     }
-
     export function motorDelay(value: number, motorFunction: SportsMode) {
         let delayTime = 0;
         if (value == 0 || servoSpeedGlobal == 0) {
@@ -99,14 +87,12 @@ namespace nezhaV2 {
             delayTime = value * 1000.0 / servoSpeedGlobal + 500;
         }
         basic.pause(delayTime);
-
     }
-
     //% group="Basic functions"
     //% block="set %motor at %speed\\%to run %direction %value %mode || %isDelay"
     //% inlineInputMode=inline
-    //% speed.min=0  speed.max=100
-    //% weight=407 
+    //% speed.min=0 speed.max=100
+    //% weight=407
     export function move(motor: MotorPostion, speed: number, direction: MovementDirection, value: number, mode: SportsMode, isDelay: DelayMode = DelayMode.AutoDelayStatus): void {
         if (speed <= 0 || value <= 0) {
             // 速度和运行值不能小于等于0
@@ -118,9 +104,7 @@ namespace nezhaV2 {
             motorDelay(value, mode);
         }
     }
-
     export function __move(motor: MotorPostion, direction: MovementDirection, value: number, mode: SportsMode): void {
-
         let buf = pins.createBuffer(8);
         buf[0] = 0xFF;
         buf[1] = 0xF9;
@@ -131,13 +115,11 @@ namespace nezhaV2 {
         buf[6] = mode;
         buf[7] = (value >> 0) & 0XFF;
         pins.i2cWriteBuffer(i2cAddr, buf);
-
     }
-
     //% group="Basic functions"
     //% weight=406
-    //% block="set %motor to rotate %turnMode at angle %angle || %isDelay  "
-    //% angle.min=0  angle.max=359
+    //% block="set %motor to rotate %turnMode at angle %angle || %isDelay "
+    //% angle.min=0 angle.max=359
     //% inlineInputMode=inline
     export function moveToAbsAngle(motor: MotorPostion, turnMode: ServoMotionMode, angle: number, isDelay: DelayMode = DelayMode.AutoDelayStatus): void {
         while (angle < 0) {
@@ -159,7 +141,6 @@ namespace nezhaV2 {
             motorDelay(0.5, SportsMode.Second)
         }
     }
-
     //% group="Basic functions"
     //% weight=404
     //% block="set %motor shutting down the motor"
@@ -175,7 +156,6 @@ namespace nezhaV2 {
         buf[7] = 0x00;
         pins.i2cWriteBuffer(i2cAddr, buf);
     }
-
     export function __start(motor: MotorPostion, direction: MovementDirection, speed: number): void {
         let buf = pins.createBuffer(8)
         buf[0] = 0xFF;
@@ -188,21 +168,19 @@ namespace nezhaV2 {
         buf[7] = 0x00;
         pins.i2cWriteBuffer(i2cAddr, buf);
     }
-
     //% group="Basic functions"
     //% weight=403
     //% block="set the speed of %motor to %speed \\% and start the motor"
-    //% speed.min=-100  speed.max=100
+    //% speed.min=-100 speed.max=100
     export function start(motor: MotorPostion, speed: number): void {
         if (speed < -100) {
             speed = -100
-        }else if (speed > 100) {
+        } else if (speed > 100) {
             speed = 100
         }
         let direction = speed > 0 ? MovementDirection.CW : MovementDirection.CCW
         __start(motor, direction, Math.abs(speed))
     }
-
     export function readAngle(motor: MotorPostion): number {
         delayMs(4)
         let buf = pins.createBuffer(8);
@@ -219,7 +197,6 @@ namespace nezhaV2 {
         let arr = pins.i2cReadBuffer(i2cAddr, 4);
         return (arr[3] << 24) | (arr[2] << 16) | (arr[1] << 8) | (arr[0]);
     }
-
     //% group="Basic functions"
     //% weight=402
     //%block="%motor absolute angular value"
@@ -230,14 +207,12 @@ namespace nezhaV2 {
         }
         return (position % 3600) * 0.1;
     }
-
     //% group="Basic functions"
-    //% weight=402
+    //% weight=401
     //%block="%motor relative angular value"
     export function readRelAngle(motor: MotorPostion): number {
         return (readAngle(motor) - relativeAngularArr[motor - 1]) * 0.1;
     }
-
     //% group="Basic functions"
     //% weight=400
     //%block="%motor speed (laps/sec)"
@@ -258,7 +233,6 @@ namespace nezhaV2 {
         let retData = (arr[1] << 8) | (arr[0]);
         return Math.floor(retData / 3.6) * 0.01;
     }
-
     //% group="Basic functions"
     //% weight=399
     //%block="set servo %motor to zero"
@@ -276,44 +250,29 @@ namespace nezhaV2 {
         relativeAngularArr[motor - 1] = 0;
         motorDelay(1, SportsMode.Second)
     }
-
-
     //% group="Basic functions"
     //% weight=397
-    //% block="set servo %motor to zero || at speed %speed\\%"
-    //% speed.min=1  speed.max=100
-    //% speed.defl=100
-    //% inlineInputMode=inline
+    //% block="set servo %motor to zero at speed %speed"
+    //% speed.min=1 speed.max=100 speed.defl=100
     export function resetWithSpeed(motor: MotorPostion, speed: number = 100): void {
-        // 限制速度范围
         if (speed < 1) {
             speed = 1;
         } else if (speed > 100) {
             speed = 100;
         }
-
-        // 设置速度
+        
         setServoSpeed(speed);
-
-        // 读取当前位置来判断移动方向和距离
-        let currentAngle = readAbsAngle(motor);
-
-        // 使用moveToAbsAngle移动到0度位置（最短路径）
         moveToAbsAngle(motor, ServoMotionMode.ShortPath, 0, DelayMode.AutoDelayStatus);
-
-        // 重置相对角度数组
         relativeAngularArr[motor - 1] = 0;
     }
-
     //% group="Basic functions"
-    //% weight=399
+    //% weight=398
     //%block="set servo %motor relative angular to zero"
     export function resetRelAngleValue(motor: MotorPostion) {
         relativeAngularArr[motor - 1] = readAngle(motor);
     }
-
     export function setServoSpeed(speed: number): void {
-        if(speed < 0) speed = 0;
+        if (speed < 0) speed = 0;
         speed *= 9;
         servoSpeedGlobal = speed;
         let buf = pins.createBuffer(8)
@@ -326,9 +285,7 @@ namespace nezhaV2 {
         buf[6] = 0x00;
         buf[7] = (speed >> 0) & 0XFF;
         pins.i2cWriteBuffer(i2cAddr, buf);
-
     }
-
     //% group="Application functions"
     //% weight=410
     //%block="set the running motor to left wheel %motor_l right wheel %motor_r"
@@ -336,11 +293,10 @@ namespace nezhaV2 {
         motorLeftGlobal = motor_l;
         motorRightGlobal = motor_r;
     }
-
     //% group="Application functions"
     //% weight=409
     //%block="Set %speed\\% speed and move %direction"
-    //% speed.min=0  speed.max=100
+    //% speed.min=0 speed.max=100
     export function comboRun(speed: number, direction: VerticallDirection): void {
         if (speed < 0) {
             speed = 0;
@@ -350,8 +306,6 @@ namespace nezhaV2 {
         __start(motorLeftGlobal, direction % 2 + 1, speed);
         __start(motorRightGlobal, (direction + 1) % 2 + 1, speed);
     }
-
-
     //% group="Application functions"
     //% weight=406
     //%block="stop movement"
@@ -359,31 +313,29 @@ namespace nezhaV2 {
         stop(motorLeftGlobal)
         stop(motorRightGlobal)
     }
-
     /**
-    * The distance length of the motor movement per circle
-    */
+     * The distance length of the motor movement per circle
+     */
     //% group="Application functions"
     //% weight=404
     //%block="Set the wheel circumference to %value %unit"
     export function setWheelPerimeter(value: number, unit: Uint): void {
-        if(value < 0){
+        if (value < 0) {
             value = 0;
         }
         if (unit == Uint.inch) {
             degreeToDistance = value * 2.54
-        }else{
+        } else {
             degreeToDistance = value
         }
     }
-
     //% group="Application functions"
     //% weight=403
     //%block="Combination Motor Move at %speed to %direction %value %uint "
-    //% speed.min=0  speed.max=100
+    //% speed.min=0 speed.max=100
     //% inlineInputMode=inline
     export function comboMove(speed: number, direction: VerticallDirection, value: number, uint: DistanceAndAngleUnit): void {
-        if(speed <= 0){
+        if (speed <= 0) {
             return;
         }
         setServoSpeed(speed)
@@ -417,16 +369,14 @@ namespace nezhaV2 {
         }
         motorDelay(value, mode);
     }
-
     //% group="Application functions"
     //% weight=402
     //%block="set the left wheel speed at %speed_l \\%, right wheel speed at %speed_r \\% and start the motor"
-    //% speed_l.min=-100  speed_l.max=100 speed_r.min=-100  speed_r.max=100
+    //% speed_l.min=-100 speed_l.max=100 speed_r.min=-100 speed_r.max=100
     export function comboStart(speed_l: number, speed_r: number): void {
         start(motorLeftGlobal, -speed_l);
         start(motorRightGlobal, speed_r);
     }
-
     //% group="export functions"
     //% weight=320
     //%block="version number"
@@ -445,4 +395,3 @@ namespace nezhaV2 {
         return `V ${version[0]}.${version[1]}.${version[2]}`;
     }
 }
-
