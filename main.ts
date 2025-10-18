@@ -279,7 +279,7 @@ namespace nezhaV2 {
 
 
     //% group="Basic functions"
-    //% weight=398
+    //% weight=397
     //% block="set servo %motor to zero || at speed %speed\\%"
     //% speed.min=1  speed.max=100
     //% speed.defl=100
