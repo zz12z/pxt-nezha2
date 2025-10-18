@@ -280,8 +280,10 @@ namespace nezhaV2 {
 
     //% group="Basic functions"
     //% weight=398
-    //%block="set servo %motor to zero at speed %speed \%"
+    //% block="set servo %motor to zero || at speed %speed\\%"
     //% speed.min=1  speed.max=100
+    //% speed.defl=100
+    //% inlineInputMode=inline
     export function resetWithSpeed(motor: MotorPostion, speed: number = 100): void {
         // 限制速度范围
         if (speed < 1) {
